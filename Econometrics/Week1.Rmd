@@ -1,0 +1,75 @@
+---
+title: "Week 1"
+author: "Multifaceted"
+date: "May 18, 2018"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+if (! 'package:tidyverse' %in% search()) library(tidyverse)
+```
+
+(a) Make the scatter diagram with sales on the vertical axis and advertising on the horizontal axis. What do you
+expect to find if you would fit a regression line to these data?
+
+```{r cars}
+data <- read_table2('TestExer-1-sales-round1.txt')
+ggplot(data, aes(x = Advert.,y = Sales)) + geom_point()
+```
+
+The model will be significantly affected by the outlier point.
+
+
+(b) Estimate the coefficients a and b in the simple regression model with sales as dependent variable and advertising
+as explanatory factor. Also compute the standard error and t-value of b. Is b significantly different from 0?
+
+```{r formula}
+md <- lm(Sales~Advert., data = data)
+summary(md)
+```
+
+a = 29.6  b - -0.325
+The standard error of b is 0.459.
+The t-value of b is -0.707, which is not significantly different from 0.
+
+(c) Compute the residuals and draw a histogram of these residuals. What conclusion do you draw from this
+histogram?
+
+```{r residual}
+res <- residuals(md)
+res <- tibble(index = 1:length(res), value = res)
+ggplot(res, aes(x = value)) + geom_histogram()
+```
+
+There is an observation of which the estimation is wrong.
+
+  
+(d) Apparently, the regression result of part (b) is not satisfactory. Once you realize that the large residual
+corresponds to the week with opening hours during the evening, how would you proceed to get a more
+satisfactory regression model?
+
+Delete the outlier point.
+
+
+(e) Delete this special week from the sample and use the remaining 19 weeks to estimate the coefficients a and
+b in the simple regression model with sales as dependent variable and advertising as explanatory factor. Also
+compute the standard error and t-value of b. Is b significantly different from 0?
+
+```{r delete outlier}
+idx <- which(data$Sales > 30)
+newdata <- data[-idx, ]
+n_md <- lm(Sales~Advert., data = newdata)
+summary(n_md)
+```
+
+a = 21.1  b = 0.375 
+The standard error of b is 0.0882.
+The t-value of b is 4.25, which is significantly different from 0.
+
+
+(f) Discuss the differences between your findings in parts (b) and (e). Describe in words what you have learned from these results.
+
+
+e eliminate the effect of outlier. Therefore the result is more reliable. We have to plot the data and remove the outlier before fitting a linear model.
